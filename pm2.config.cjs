@@ -1,3 +1,5 @@
+const FNM = process.env.FNM_MULTISHELL_PATH
+
 module.exports = {
   apps: [
     {
@@ -5,7 +7,7 @@ module.exports = {
       max_restarts: 1,
       combine_logs: true,
       script: './lib/index.js',
-      interpreter: `${process.env.FNM_MULTISHELL_PATH}/bin/node`,
+      interpreter: FNM ? `${FNM}/bin/node` : 'node',
     },
   ],
 }
