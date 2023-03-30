@@ -7,7 +7,7 @@ module.exports = {
       cwd: __dirname,
       combine_logs: true,
       watch: true,
-      ignore_watch: ['node_modules'],
+      ignore_watch: ['node_modules', '.git'],
       script: './lib/index.js',
       interpreter: FNM ? `${FNM}/bin/node` : 'node',
     },
