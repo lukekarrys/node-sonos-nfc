@@ -1,4 +1,4 @@
-const FNM = process.env.FNM_MULTISHELL_PATH
+const FNM = process.env.FNM_DIR
 
 module.exports = {
   apps: [
@@ -9,7 +9,7 @@ module.exports = {
       watch: true,
       ignore_watch: ['node_modules', '.git'],
       script: './lib/index.js',
-      interpreter: FNM ? `${FNM}/bin/node` : 'node',
+      interpreter: FNM ? `${FNM}/aliases/18/bin/node` : 'node',
     },
   ],
 }
