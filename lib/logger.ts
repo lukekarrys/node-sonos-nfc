@@ -13,7 +13,7 @@ const emitter = new EventEmitter()
 
 const logFn =
   (level: Level) =>
-  (...args: any[]) =>
+  (...args: unknown[]) =>
     void emitter.emit('log', level, ...args)
 
 export const log = {
@@ -35,12 +35,12 @@ const date = () => {
 }
 
 export default ({ level: logLevel = 'debug' as Level } = {}) => {
-  const handler = (level: Level, ...args: any[]) => {
+  const handler = (level: Level, ...args: unknown[]) => {
     if (levels.get(level)! <= levels.get(logLevel)!) {
       console.log(
         level.toUpperCase(),
         date(),
-        ...args.map((a) => inspect(a, { depth: Infinity, colors: true }))
+        ...args.map((a) => inspect(a, { depth: Infinity, colors: true })),
       )
     }
   }

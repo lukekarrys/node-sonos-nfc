@@ -16,7 +16,9 @@ export class FindReader {
   }) {
     this.#cardName = cardName
     this.#request = request
-    this.#pcsc = new PCSC().on('error', (err) => log.error('PCSC error:', err))
+    this.#pcsc = new PCSC().on('error', (err) => {
+      throw new Error('PCSC error', { cause: err })
+    })
   }
 
   async init() {
@@ -38,10 +40,10 @@ export class FindReader {
         log.info(`Found reader: ${name}`)
 
         resolve(reader)
-      })
+      }),
     )
 
-    let cards = new Map<string, number>()
+    const cards = new Map<string, number>()
 
     reader
       .on('card', async ({ uid = '' }) => {
@@ -53,7 +55,7 @@ export class FindReader {
 
         log.info(`records:`, records)
 
-        for (const record of records) {
+        for (const record of records ?? []) {
           try {
             await this.#request(record)
           } catch (err) {
@@ -64,14 +66,16 @@ export class FindReader {
       })
       .on('card.off', ({ uid = '' }) => {
         const start = cards.get(uid)
-        log.info(`card.off: ${uid} - ${start ? `${Date.now() - start}ms` : ''}`)
+        log.debug(
+          `card.off: ${uid}${start ? ` - ${Date.now() - start}ms` : ''}`,
+        )
         cards.delete(uid)
       })
       .on('error', (err) => log.error(`reader error:`, err))
       .on('end', () => {
         log.info(`Reader removed: ${reader.name}`)
         reader.removeAllListeners()
-        setTimeout(() => this.#findReader(), 100)
+        setTimeout(() => this.init(), 100)
       })
   }
 

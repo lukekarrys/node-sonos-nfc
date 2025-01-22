@@ -31,7 +31,7 @@ const main = async (opts: {
 
   if (opts.cardName === null) {
     await sonos.init()
-    readline({ request })
+    await readline({ request })
   } else {
     await Promise.all([
       sonos.init(),
@@ -44,7 +44,7 @@ const main = async (opts: {
 await main({
   cardName: process.env.SONOS_READLINE
     ? null
-    : process.env.SONOS_CARDNAME ?? 'ACR122U',
+    : (process.env.SONOS_CARDNAME ?? 'ACR122U'),
   logLevel: process.env.SONOS_LOGLEVEL ?? 'info',
   host: process.env.SONOS_HOST ?? 'http://192.168.7.14:5005',
   roomName: process.env.SONOS_ROOM ?? 'office',

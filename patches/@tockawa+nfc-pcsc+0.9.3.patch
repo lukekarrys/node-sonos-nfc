@@ -56,6 +56,18 @@ index 6444f36..f8df9f0 100644
          this.reader.close();
      }
  }
+diff --git a/node_modules/@tockawa/nfc-pcsc/dist/types/src/index.d.ts b/node_modules/@tockawa/nfc-pcsc/dist/types/src/index.d.ts
+index b1e8062..a6ac643 100644
+--- a/node_modules/@tockawa/nfc-pcsc/dist/types/src/index.d.ts
++++ b/node_modules/@tockawa/nfc-pcsc/dist/types/src/index.d.ts
+@@ -19,6 +19,7 @@ export default class PCSC extends EventEmitter {
+     private pcsc;
+     constructor();
+     on<K extends keyof PCSCEvents>(event: K, listener: (v: PCSCEvents[K]) => void): this;
++    once<K extends keyof PCSCEvents>(event: K, listener: (v: PCSCEvents[K]) => void): this;
+     emit<K extends keyof PCSCEvents>(event: K, arg: PCSCEvents[K]): boolean;
+     get readers(): any;
+     close(): boolean;
 diff --git a/node_modules/@tockawa/nfc-pcsc/package.json b/node_modules/@tockawa/nfc-pcsc/package.json
 index 7c829d3..324bc13 100644
 --- a/node_modules/@tockawa/nfc-pcsc/package.json

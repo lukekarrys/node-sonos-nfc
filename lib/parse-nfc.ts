@@ -1,4 +1,10 @@
-// @ts-expect-error
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+
+// @ts-expect-error - no types for this package
 import ndeflib from 'ndef-lib'
 
 type ParsedRecord =
@@ -59,7 +65,7 @@ export class NFCCard {
 
   parseNDEF(NDEFRawMessage: Buffer) {
     const NDEFlibRecords = new ndeflib.NdefMessage.fromByteArray(
-      this.#cleanNDEFMessage(NDEFRawMessage)
+      this.#cleanNDEFMessage(NDEFRawMessage),
     )._records
 
     const NDEFlibRecordsParsed: ParsedRecord[] = []

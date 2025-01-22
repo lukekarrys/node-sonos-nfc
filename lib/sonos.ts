@@ -80,7 +80,7 @@ export class Sonos {
             headers: {
               'content-type': 'application/x-www-form-urlencoded',
               'content-length': Buffer.byteLength(
-                new URLSearchParams(body).toString()
+                new URLSearchParams(body).toString(),
               ).toString(),
             },
           }
@@ -110,9 +110,10 @@ export class Sonos {
     log.info(
       req.method,
       req.url.replace(this.#url, ''),
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       req.body ? req.body.toString() : null,
       `status:${res.status}`,
-      `time:${Date.now() - start}ms`
+      `time:${Date.now() - start}ms`,
     )
 
     return res
@@ -120,11 +121,11 @@ export class Sonos {
 
   async #setRoom(roomName: string) {
     const names = await this.#request('/devices/name').then(
-      (r) => r?.json() as unknown as string[]
+      (r) => r?.json() as unknown as string[],
     )
     if (!names.includes(roomName)) {
       throw new Error(
-        `Could not set room name to ${roomName}. Must be one of: ${names}`
+        `Could not set room name to ${roomName}. Must be one of: ${names.join(',')}`,
       )
     }
     this.#room = roomName

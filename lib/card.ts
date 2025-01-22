@@ -67,6 +67,6 @@ export const getCardRecords = async (reader: NFCReader) => {
     const card = await parseCard(reader)
     return await readCard(reader, card)
   } catch {
-    return []
+    return null
   }
 }

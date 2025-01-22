@@ -1,7 +1,7 @@
-import { createInterface } from 'readline'
+import { createInterface } from 'readline/promises'
 import { log } from './logger.ts'
 
-export const readline = ({
+export const readline = async ({
   request,
 }: {
   request: (line: string) => Promise<void>
@@ -9,18 +9,14 @@ export const readline = ({
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
-    prompt: 'sonos > ',
   })
 
-  rl.on('line', async (line) => {
+  while (true) {
     try {
+      const line = await rl.question('sonos > ')
       await request(line)
     } catch (err) {
       log.error(err)
     }
-
-    rl.prompt()
-  })
-
-  rl.prompt()
+  }
 }

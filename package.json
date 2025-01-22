@@ -5,6 +5,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "lint": "prettier --write . && eslint . --fix",
     "start": "node lib/index.js",
     "postinstall": "patch-package"
   },
@@ -16,9 +17,13 @@
     "patch-package": "^8.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.18.0",
     "@types/node": "^22.10.7",
-    "eslint": "^8.37.0",
-    "prettier": "^2.8.7"
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.21.0"
   },
   "engines": {
     "node": ">=23.6.0"
