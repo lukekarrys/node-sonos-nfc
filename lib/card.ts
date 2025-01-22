@@ -47,7 +47,10 @@ const readCard = async (reader: NFCReader, card: NFCCard) => {
 
   const records = card.parseNDEF(NDEFRawMessage).map((raw) => ({
     type: raw.type,
-    value: raw.type === 'text' ? raw.text : raw.type === 'uri' ? raw.uri : null,
+    value:
+      raw.type === 'text' ? raw.text
+      : raw.type === 'uri' ? raw.uri
+      : null,
     raw,
   }))
 

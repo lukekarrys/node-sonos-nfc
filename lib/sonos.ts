@@ -74,17 +74,17 @@ export class Sonos {
 
     const req = new Request(`${this.#url}${path}`, {
       method: method ?? (body ? 'POST' : 'GET'),
-      ...(body
-        ? {
-            body: new URLSearchParams(body),
-            headers: {
-              'content-type': 'application/x-www-form-urlencoded',
-              'content-length': Buffer.byteLength(
-                new URLSearchParams(body).toString(),
-              ).toString(),
-            },
-          }
-        : {}),
+      ...(body ?
+        {
+          body: new URLSearchParams(body),
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            'content-length': Buffer.byteLength(
+              new URLSearchParams(body).toString(),
+            ).toString(),
+          },
+        }
+      : {}),
       signal: AbortSignal.timeout(2000),
     })
 
@@ -100,8 +100,9 @@ export class Sonos {
         cause: {
           req,
           res,
-          message: res.headers.get('content-type')?.includes('application/json')
-            ? await res.json()
+          message:
+            res.headers.get('content-type')?.includes('application/json') ?
+              await res.json()
             : await res.text(),
         },
       })
