@@ -13,6 +13,7 @@ const main = async (opts: {
   host: string
   roomName: string
   dryRun?: boolean
+  timeout?: number
 }) => {
   logger({ level: opts.logLevel as Level })
 
@@ -27,6 +28,7 @@ const main = async (opts: {
     host: opts.host,
     initialRoom: opts.roomName,
     dryRun: opts.dryRun,
+    timeout: opts.timeout,
   })
 
   try {
@@ -74,4 +76,8 @@ await main({
   host: process.env.SONOS_HOST ?? 'http://192.168.7.14:5005',
   roomName: process.env.SONOS_ROOM ?? 'office',
   dryRun: process.env.SONOS_DRYRUN === 'true',
+  timeout:
+    'SONOS_TIMEOUT' in process.env ?
+      Number(process.env.SONOS_TIMEOUT)
+    : undefined,
 })

@@ -12,19 +12,23 @@ export class Sonos {
   #initialRoom: string
   #dryRun?: boolean
   #room: string | null = null
+  #timeout: number
 
   constructor({
     host: url,
     initialRoom,
     dryRun,
+    timeout = 2000,
   }: {
     dryRun?: boolean
     host: string
     initialRoom: string
+    timeout?: number
   }) {
     this.#url = url
     this.#initialRoom = initialRoom
     this.#dryRun = dryRun
+    this.#timeout = timeout
   }
 
   async init() {
@@ -77,7 +81,7 @@ export class Sonos {
 
     const body = rawBody ? new URLSearchParams(rawBody) : null
     const req = new Request(`${this.#url}${path}`, {
-      signal: AbortSignal.timeout(2000),
+      ...(this.#timeout ? { signal: AbortSignal.timeout(this.#timeout) } : {}),
       method: method ?? (body ? 'POST' : 'GET'),
       ...(body ?
         {
