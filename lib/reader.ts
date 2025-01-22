@@ -45,12 +45,14 @@ export class FindReader {
 
     reader
       .on('card.on', async (c) => {
-        log.info(`card.on`)
+        const start = Date.now()
+
+        log.info('card.on')
         log.debug(`card.on`, c)
 
         const records = await getCardRecords(reader)
 
-        log.info(`card records`, records)
+        log.info(`card records`, records, `${Date.now() - start}ms`)
 
         for (const record of records ?? []) {
           try {

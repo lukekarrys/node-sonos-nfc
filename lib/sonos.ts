@@ -91,7 +91,13 @@ export class Sonos {
     })
 
     if (req.method === 'POST' && this.#dryRun) {
-      log.info('Dry run:', req)
+      log.info(
+        'Dry run:',
+        req.method,
+        req.url.replace(this.#url, ''),
+        body ? body.toString() : null,
+      )
+      log.debug('Dry run:', req)
       return
     }
 
@@ -113,8 +119,7 @@ export class Sonos {
     log.info(
       req.method,
       req.url.replace(this.#url, ''),
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      req.body ? req.body.toString() : null,
+      body ? body.toString() : null,
       `status:${res.status}`,
       `time:${Date.now() - start}ms`,
     )
@@ -123,13 +128,15 @@ export class Sonos {
   }
 
   async #setRoom(roomName: string) {
-    const names = await this.#request('/devices/name').then(
-      (r) => r?.json() as unknown as string[],
-    )
-    if (!names.includes(roomName)) {
-      throw new Error(
-        `Could not set room name to ${roomName}. Must be one of: ${names.join(',')}`,
+    if (!this.#dryRun) {
+      const names = await this.#request('/devices/name').then(
+        (r) => r?.json() as unknown as string[],
       )
+      if (!names.includes(roomName)) {
+        throw new Error(
+          `Could not set room name to ${roomName}. Must be one of: ${names.join(',')}`,
+        )
+      }
     }
     this.#room = roomName
     log.info(`Current room updated to:`, this.#room)

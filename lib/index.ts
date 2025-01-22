@@ -35,7 +35,8 @@ const main = async (opts: {
       err instanceof Error &&
       err.cause instanceof Error &&
       'code' in err.cause &&
-      err.cause.code === 'ECONNREFUSED'
+      err.cause.code === 'ECONNREFUSED' &&
+      !opts.dryRun
     ) {
       throw new Error(
         `Connection refused to ${opts.host}. Make sure server is running.`,
