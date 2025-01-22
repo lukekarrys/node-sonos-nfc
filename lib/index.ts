@@ -18,6 +18,7 @@ const main = async (opts: {
 
   log.info('SHA:', execSync('git rev-list HEAD | head -1').toString().trim())
   log.info('Date:', new Date().toLocaleString())
+  log.info('Node:', process.version)
   for (const [k, v] of Object.entries(opts)) {
     log.info(k, v)
   }
