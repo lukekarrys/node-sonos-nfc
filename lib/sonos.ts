@@ -10,11 +10,21 @@ type RequestOptions = {
 export class Sonos {
   #url: string
   #initialRoom: string
+  #dryRun?: boolean
   #room: string | null = null
 
-  constructor({ url, initialRoom }: { url: string; initialRoom: string }) {
+  constructor({
+    host: url,
+    initialRoom,
+    dryRun,
+  }: {
+    dryRun?: boolean
+    host: string
+    initialRoom: string
+  }) {
     this.#url = url
     this.#initialRoom = initialRoom
+    this.#dryRun = dryRun
   }
 
   async init() {
@@ -73,6 +83,11 @@ export class Sonos {
       signal: AbortSignal.timeout(2000),
     })
 
+    if (req.method === 'POST' && this.#dryRun) {
+      log.info('Dry run:', req)
+      return
+    }
+
     const res = await fetch(req)
 
     if (!res.ok) {
@@ -99,7 +114,7 @@ export class Sonos {
 
   async #setRoom(roomName: string) {
     const names = await this.#request('/devices/name').then(
-      (r) => r.json() as unknown as string[]
+      (r) => r?.json() as unknown as string[]
     )
     if (!names.includes(roomName)) {
       throw new Error(

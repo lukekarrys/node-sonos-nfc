@@ -1,0 +1,58 @@
+diff --git a/node_modules/@tockawa/nfc-pcsc/dist/esm/src/index.mjs b/node_modules/@tockawa/nfc-pcsc/dist/esm/src/index.mjs
+index 91250fe..1763a11 100644
+--- a/node_modules/@tockawa/nfc-pcsc/dist/esm/src/index.mjs
++++ b/node_modules/@tockawa/nfc-pcsc/dist/esm/src/index.mjs
+@@ -1,8 +1,8 @@
+ import pcsc from "@pokusew/pcsclite";
+ import { EventEmitter } from "events";
+-import ACR122 from "./utils/readers/ACR122";
+-import Reader from "./utils/readers/Reader";
+-import { KEYS, MODES, TAGS } from "./utils/readers/helpers/TMK";
++import ACR122 from "./utils/readers/ACR122.mjs";
++import Reader from "./utils/readers/Reader.mjs";
++import { KEYS, MODES, TAGS } from "./utils/readers/helpers/TMK.mjs";
+ export { Reader, ACR122, KEYS, MODES, TAGS };
+ export default class PCSC extends EventEmitter {
+     pcsc = pcsc();
+diff --git a/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/ACR122.mjs b/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/ACR122.mjs
+index fdd821e..8d85b2f 100644
+--- a/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/ACR122.mjs
++++ b/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/ACR122.mjs
+@@ -1,5 +1,5 @@
+-import { ConnectError, ERRORS } from "../errors";
+-import Reader from "./Reader";
++import { ConnectError, ERRORS } from "../errors/index.mjs";
++import Reader from "./Reader.mjs";
+ /**
+  * Configuration for LED behavior corresponding to various states.
+  */
+diff --git a/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/Reader.mjs b/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/Reader.mjs
+index 6444f36..3a80981 100644
+--- a/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/Reader.mjs
++++ b/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/Reader.mjs
+@@ -1,7 +1,7 @@
+ "use strict";
+ import EventEmitter from "events";
+-import { GetUIDError, ERRORS, ConnectError, DisconnectError, TransmitError, ControlError, LoadAuthenticationKeyError, WriteError, AuthenticationError, ReadError, } from "../errors";
+-import { TAGS, MODES } from "./helpers/TMK";
++import { GetUIDError, ERRORS, ConnectError, DisconnectError, TransmitError, ControlError, LoadAuthenticationKeyError, WriteError, AuthenticationError, ReadError, } from "../errors/index.mjs";
++import { TAGS, MODES } from "./helpers/TMK.mjs";
+ export default class Reader extends EventEmitter {
+     reader;
+     connection;
+diff --git a/node_modules/@tockawa/nfc-pcsc/package.json b/node_modules/@tockawa/nfc-pcsc/package.json
+index 7c829d3..324bc13 100644
+--- a/node_modules/@tockawa/nfc-pcsc/package.json
++++ b/node_modules/@tockawa/nfc-pcsc/package.json
+@@ -7,7 +7,10 @@
+ 	"types": "dist/types/src/index.d.ts",
+ 	"exports": {
+ 		".": {
+-			"import": "./dist/esm/src/index.mjs",
++			"import": {
++				"types":"./dist/types/src/index.d.ts",
++				"default":"./dist/esm/src/index.mjs"
++			},
+ 			"require": "./dist/commonjs/src/index.js"
+ 		},
+ 		"./package.json": "./package.json"

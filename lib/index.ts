@@ -10,9 +10,8 @@ dotenv.config()
 const main = async (opts: {
   cardName: string | null
   logLevel: string
-  url: string
+  host: string
   roomName: string
-  debugNfc: boolean
 }) => {
   logger({ level: opts.logLevel as Level })
 
@@ -22,37 +21,24 @@ const main = async (opts: {
     log.info(k, v)
   }
 
-  const sonos = new Sonos({ url: opts.url, initialRoom: opts.roomName })
+  const sonos = new Sonos({ host: opts.host, initialRoom: opts.roomName })
+  const request = async (txt: string) => void (await sonos.process(txt))
 
   const reader =
     opts.cardName === null
-      ? new Readline({
-          request: async (txt) => {
-            await sonos.process(txt)
-          },
-        })
-      : new Reader({
-          cardName: opts.cardName,
-          debugNfc: opts.debugNfc,
-          request: async (txt) => {
-            await sonos.process(txt)
-          },
-        })
+      ? new Readline({ request })
+      : new Reader({ cardName: opts.cardName, request })
 
   await Promise.all([sonos.init(), reader.init()])
 
   log.info('READY')
 }
 
-main({
+await main({
   cardName: process.env.SONOS_READLINE
     ? null
     : process.env.SONOS_CARDNAME ?? 'ACR122U',
   logLevel: process.env.SONOS_LOGLEVEL ?? 'info',
-  url: process.env.SONOS_URL ?? 'http://192.168.7.14:5005',
+  host: process.env.SONOS_HOST ?? 'http://192.168.7.14:5005',
   roomName: process.env.SONOS_ROOM ?? 'office',
-  debugNfc: process.env.DEBUG_NFC == 'true',
-}).catch((err) => {
-  log.error(err)
-  process.exitCode = 1
 })

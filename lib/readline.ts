@@ -12,7 +12,7 @@ export class Readline {
       })
       .on('line', async (line) => {
         try {
-          const res = await request(line)
+          await request(line)
           console.error('> ok')
         } catch (err) {
           console.error('> Error', err)

@@ -1,4 +1,4 @@
-import { NFC, type Reader as NFCReader } from 'nfc-pcsc'
+import PCSC, { type Reader as NFCReader } from '@tockawa/nfc-pcsc'
 import { log } from './logger.ts'
 import { getCardRecords } from './card.ts'
 
@@ -9,26 +9,14 @@ export class Reader {
 
   constructor({
     cardName,
-    debugNfc,
     request,
   }: {
     cardName: string
-    debugNfc?: boolean
     request: (txt: string) => Promise<void>
   }) {
     this.#cardName = cardName
     this.#request = request
-    this.#nfc = new NFC(
-      debugNfc
-        ? {
-            log: log.debug,
-            debug: log.debug,
-            info: log.debug,
-            warn: log.debug,
-            error: log.debug,
-          }
-        : null
-    ).on('error', (err) => log.error('NFC error:', err))
+    this.#nfc = new PCSC().on('error', (err) => log.error('NFC error:', err))
   }
 
   async init() {
@@ -59,7 +47,7 @@ export class Reader {
     reader
       .on('card', async (card) => {
         start = Date.now()
-        log.info(`card: ${card.type} - ${card.uid}`)
+        log.info(`card: ${card.uid}`)
         log.debug(card)
 
         if (state === 'BUSY') {
@@ -68,7 +56,7 @@ export class Reader {
         }
 
         state = 'BUSY'
-        for (const [record] of await getCardRecords(reader)) {
+        for (const record of await getCardRecords(reader)) {
           try {
             await this.#request(record)
           } catch (err) {
@@ -80,9 +68,7 @@ export class Reader {
       })
       .on('card.off', (card) => {
         log.info(
-          `card.off: ${card.type} - ${card.uid} - ${
-            start ? `${Date.now() - start}ms` : ''
-          }`
+          `card.off: ${card.uid} - ${start ? `${Date.now() - start}ms` : ''}`
         )
         start = 0
       })
