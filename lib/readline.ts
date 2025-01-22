@@ -1,28 +1,26 @@
-import readline from 'readline'
+import { createInterface } from 'readline'
+import { log } from './logger.ts'
 
-export class Readline {
-  #rl
+export const readline = ({
+  request,
+}: {
+  request: (line: string) => Promise<void>
+}) => {
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    prompt: 'sonos > ',
+  })
 
-  constructor({ request }: { request: (line: string) => Promise<void> }) {
-    this.#rl = readline
-      .createInterface({
-        input: process.stdin,
-        output: process.stdout,
-        prompt: 'sonos > ',
-      })
-      .on('line', async (line) => {
-        try {
-          await request(line)
-          console.error('> ok')
-        } catch (err) {
-          console.error('> Error', err)
-        }
+  rl.on('line', async (line) => {
+    try {
+      await request(line)
+    } catch (err) {
+      log.error(err)
+    }
 
-        this.#rl.prompt()
-      })
-  }
+    rl.prompt()
+  })
 
-  async init() {
-    await setImmediate(() => this.#rl.prompt())
-  }
+  rl.prompt()
 }

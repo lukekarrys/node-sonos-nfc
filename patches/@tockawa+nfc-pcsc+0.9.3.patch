@@ -27,7 +27,7 @@ index fdd821e..8d85b2f 100644
   * Configuration for LED behavior corresponding to various states.
   */
 diff --git a/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/Reader.mjs b/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/Reader.mjs
-index 6444f36..3a80981 100644
+index 6444f36..f8df9f0 100644
 --- a/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/Reader.mjs
 +++ b/node_modules/@tockawa/nfc-pcsc/dist/esm/src/utils/readers/Reader.mjs
 @@ -1,7 +1,7 @@
@@ -40,6 +40,22 @@ index 6444f36..3a80981 100644
  export default class Reader extends EventEmitter {
      reader;
      connection;
+@@ -32,7 +32,6 @@ export default class Reader extends EventEmitter {
+             if (response && response.length >= 2) {
+                 const statusCode = response.readUInt16BE(response.length - 2);
+                 if (statusCode === 0x9000) {
+-                    console.log(this.card);
+                     this.card.uid = response
+                         .subarray(0, response.length - 2)
+                         .toString("hex");
+@@ -411,7 +410,6 @@ export default class Reader extends EventEmitter {
+         return true;
+     }
+     close() {
+-        console.log("Closing reader");
+         this.reader.close();
+     }
+ }
 diff --git a/node_modules/@tockawa/nfc-pcsc/package.json b/node_modules/@tockawa/nfc-pcsc/package.json
 index 7c829d3..324bc13 100644
 --- a/node_modules/@tockawa/nfc-pcsc/package.json

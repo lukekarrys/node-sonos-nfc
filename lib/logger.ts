@@ -1,4 +1,5 @@
 import EventEmitter from 'events'
+import { inspect } from 'util'
 
 export type Level = 'error' | 'info' | 'debug'
 
@@ -36,7 +37,11 @@ const date = () => {
 export default ({ level: logLevel = 'debug' as Level } = {}) => {
   const handler = (level: Level, ...args: any[]) => {
     if (levels.get(level)! <= levels.get(logLevel)!) {
-      console.log(level.toUpperCase(), date(), ...args)
+      console.log(
+        level.toUpperCase(),
+        date(),
+        ...args.map((a) => inspect(a, { depth: Infinity, colors: true }))
+      )
     }
   }
   emitter.on('log', handler)

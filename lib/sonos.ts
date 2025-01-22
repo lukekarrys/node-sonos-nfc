@@ -35,6 +35,11 @@ export class Sonos {
     log.info('Command:', cmdString)
 
     const cmd = cmdString.trim()
+
+    if (!cmd) {
+      return
+    }
+
     const isUrl = URL.canParse(cmd)
     const isShorthand = cmd.includes(':')
 
@@ -93,7 +98,8 @@ export class Sonos {
     if (!res.ok) {
       throw new Error(`Request error`, {
         cause: {
-          ...req,
+          req,
+          res,
           message: res.headers.get('content-type')?.includes('application/json')
             ? await res.json()
             : await res.text(),

@@ -11,7 +11,7 @@ const parseCard = async (reader: NFCReader) => {
   }
 
   if (!header) {
-    throw new Error('Could not read header from card')
+    throw new Error('No header found on card')
   }
 
   const card = new NFCCard(header)
