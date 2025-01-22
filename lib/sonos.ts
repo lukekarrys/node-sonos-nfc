@@ -48,7 +48,7 @@ export class Sonos {
     const isShorthand = cmd.includes(':')
 
     if (isUrl || isShorthand) {
-      return this.#request('/replace-queue', {
+      return this.#request(`/replace-queue${isShorthand ? `/${cmd}` : ''}`, {
         room: true,
         method: 'POST',
         body: {
