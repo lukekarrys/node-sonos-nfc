@@ -9,7 +9,7 @@ module.exports = {
       watch: true,
       cron_restart: '0 6,18 * * *',
       ignore_watch: ['node_modules', '.git'],
-      script: './lib/index.js',
+      script: './lib/index.ts',
       interpreter: FNM ? `${FNM}/aliases/18/bin/node` : 'node',
     },
   ],

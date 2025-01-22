@@ -7,19 +7,18 @@
   "scripts": {
     "start": "node lib/index.js"
   },
-  "author": "Ryan Olf",
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.0.3",
     "nfc-pcsc": "^0.8.1",
-    "nfccard-tool": "^0.1.1",
-    "proc-log": "^3.0.0"
+    "nfccard-tool": "^0.1.1"
   },
   "devDependencies": {
+    "@types/node": "^22.10.7",
     "eslint": "^8.37.0",
     "prettier": "^2.8.7"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.13.0"
   }
 }
