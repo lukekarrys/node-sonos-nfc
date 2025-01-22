@@ -44,7 +44,7 @@ export class Sonos {
       return
     }
 
-    const isUrl = URL.canParse(cmd)
+    const isUrl = URL.canParse(cmd) ? new URL(cmd).origin !== 'null' : false
     const isShorthand = cmd.includes(':')
 
     if (isUrl || isShorthand) {
