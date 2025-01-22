@@ -60,7 +60,7 @@ const readCard = async (reader: NFCReader, card: NFCCard) => {
     })
   }
 
-  log.debug('Records', records)
+  log.debug('raw records', records)
 
   return records.map(({ value }) => value).filter((v) => v !== null)
 }

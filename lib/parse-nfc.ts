@@ -1,26 +1,28 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+import ndeflib_ from 'ndef-lib'
+const { NdefMessage, NdefTextRecord, NdefUriRecord } = ndeflib_
 
-// @ts-expect-error - no types for this package
-import ndeflib from 'ndef-lib'
+const ensureByte = (buf: Buffer, index: number): number => {
+  const b = buf[index]
+  if (b === undefined) {
+    throw new Error(`Buffer index ${index} not found`)
+  }
+  return b
+}
 
 type ParsedRecord =
   | {
-      NDEFLibRecord: any
+      NDEFLibRecord: unknown
       type: 'text'
       text: string
       language: string
     }
   | {
-      NDEFLibRecord: any
+      NDEFLibRecord: unknown
       type: 'uri'
       uri: string
     }
   | {
-      NDEFLibRecord: any
+      NDEFLibRecord: unknown
       type: 'unsupported'
     }
 
@@ -41,10 +43,10 @@ export class NFCCard {
     // RFU
     // Block 2
     // http://apps4android.org/nfc-specifications/NFCForum-TS-Type-2-Tag_1.1.pdf - page 20
-    this.#MAGIC_NUMBER = tagHeader[12]!
-    this.#READ_ACCESS = tagHeader[15]!
-    this.#HAS_NDEF = tagHeader[16]!
-    this.#MESSAGE_LENGTH = tagHeader[17]!
+    this.#MAGIC_NUMBER = ensureByte(tagHeader, 12)
+    this.#READ_ACCESS = ensureByte(tagHeader, 15)
+    this.#HAS_NDEF = ensureByte(tagHeader, 16)
+    this.#MESSAGE_LENGTH = ensureByte(tagHeader, 17)
   }
 
   isFormatedAsNDEF(): boolean {
@@ -52,33 +54,31 @@ export class NFCCard {
   }
 
   hasReadPermissions(): boolean {
-    return (this.#READ_ACCESS! & 0xf0) >> 4 === 0x00
+    return (this.#READ_ACCESS & 0xf0) >> 4 === 0x00
   }
 
   hasNDEFMessage(): boolean {
-    return this.#HAS_NDEF! === 0x03
+    return this.#HAS_NDEF === 0x03
   }
 
   getNDEFMessageLengthToRead(): number {
-    return this.#MESSAGE_LENGTH! + 2
+    return this.#MESSAGE_LENGTH + 2
   }
 
   parseNDEF(NDEFRawMessage: Buffer) {
-    const NDEFlibRecords = new ndeflib.NdefMessage.fromByteArray(
+    const NDEFlibRecords = NdefMessage.fromByteArray(
       this.#cleanNDEFMessage(NDEFRawMessage),
-    )._records
+    ).getRecords()
 
     const NDEFlibRecordsParsed: ParsedRecord[] = []
 
-    for (let i = 0; i < NDEFlibRecords.length; i++) {
-      const NDEFlibRecord = NDEFlibRecords[i]
-
+    for (const NDEFlibRecord of NDEFlibRecords) {
       // converts buffer to ascii - eg. ascii:T, arrayBuffer: [54], Buffer: 0x54
       const recordType = Buffer.from(NDEFlibRecord.getType()).toString('ascii')
 
       switch (recordType) {
         case 'T': {
-          const NDEFlibTextRecord = new ndeflib.NdefTextRecord()
+          const NDEFlibTextRecord = new NdefTextRecord()
           NDEFlibTextRecord.setPayload(NDEFlibRecord.getPayload())
           NDEFlibRecordsParsed.push({
             NDEFLibRecord: NDEFlibTextRecord,
@@ -98,7 +98,7 @@ export class NFCCard {
            *    NdefSocialRecord (http://SocialWebsite/Username)
            */
 
-          const NDEFlibUriRecord = new ndeflib.NdefUriRecord()
+          const NDEFlibUriRecord = new NdefUriRecord()
           NDEFlibUriRecord.setPayload(NDEFlibRecord.getPayload())
           NDEFlibUriRecord.type = 'U'
           NDEFlibRecordsParsed.push({
@@ -131,6 +131,11 @@ export class NFCCard {
     if (NDEFRawMessage[NDEFRawMessage.length - 1] === 0xfe) {
       NDEFRawMessageCleaned = NDEFRawMessage.slice(0, -1)
     }
-    return NDEFRawMessageCleaned!
+    if (!NDEFRawMessageCleaned) {
+      throw new Error('Could not clean NDEF message', {
+        cause: { NDEFRawMessage },
+      })
+    }
+    return NDEFRawMessageCleaned
   }
 }
