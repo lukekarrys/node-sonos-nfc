@@ -14,7 +14,11 @@ type ParsedRecord =
       NDEFLibRecord: unknown
       type: 'text'
       text: string
-      language: string
+    }
+  | {
+      NDEFLibRecord: unknown
+      type: 'raw_text'
+      text: string
     }
   | {
       NDEFLibRecord: unknown
@@ -84,20 +88,11 @@ export class NFCCard {
             NDEFLibRecord: NDEFlibTextRecord,
             type: 'text',
             text: NDEFlibTextRecord.getText(),
-            language: NDEFlibTextRecord.getLanguageCode(),
           })
           break
         }
 
         case 'U': {
-          /**
-           * There are several sub-types of Uri records but we only parse as standard Uri record
-           * Types supported by NDEF-lib:
-           *    NdefTelRecord (tel:PhoneNumber)
-           *    NdefGeoRecord (geo:Long,Lat)
-           *    NdefSocialRecord (http://SocialWebsite/Username)
-           */
-
           const NDEFlibUriRecord = new NdefUriRecord()
           NDEFlibUriRecord.setPayload(NDEFlibRecord.getPayload())
           NDEFlibUriRecord.type = 'U'
@@ -109,12 +104,25 @@ export class NFCCard {
           break
         }
 
-        default:
-          NDEFlibRecordsParsed.push({
-            NDEFLibRecord: NDEFlibRecord,
-            type: 'unsupported',
-          })
+        default: {
+          try {
+            // ToolboxPro on iOS writes in this format. Note sure why the type is empty
+            // but the payload is a buffer of utf8 characters
+            const decoder = new TextDecoder('utf-8', { fatal: true })
+            NDEFlibRecordsParsed.push({
+              NDEFLibRecord: NDEFlibRecord,
+              type: 'raw_text',
+              text: decoder.decode(Buffer.from(NDEFlibRecord.getPayload())),
+            })
+          } catch {
+            // If decoding fails for any reason than it is unsupported
+            NDEFlibRecordsParsed.push({
+              NDEFLibRecord: NDEFlibRecord,
+              type: 'unsupported',
+            })
+          }
           break
+        }
       }
     }
 

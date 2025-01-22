@@ -1,5 +1,5 @@
 import EventEmitter from 'events'
-import { inspect } from 'util'
+import { formatWithOptions } from 'util'
 
 export type Level = 'error' | 'info' | 'debug'
 
@@ -40,7 +40,9 @@ export default ({ level: logLevel = 'debug' as Level } = {}) => {
       console.log(
         level.toUpperCase(),
         date(),
-        ...args.map((a) => inspect(a, { depth: Infinity, colors: true })),
+        ...args.map((a) =>
+          formatWithOptions({ depth: Infinity, colors: true }, a),
+        ),
       )
     }
   }

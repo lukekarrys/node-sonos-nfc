@@ -62,7 +62,10 @@ export class Sonos {
     return this.#request(`/${cmd}`, { room: true, method: 'POST' })
   }
 
-  async #request(path: Path, { room, body, method }: RequestOptions = {}) {
+  async #request(
+    path: Path,
+    { room, body: rawBody, method }: RequestOptions = {},
+  ) {
     if (room) {
       if (!this.#room) {
         throw new Error('Room must be set by calling `setRoom(name)`')
@@ -72,20 +75,19 @@ export class Sonos {
 
     const start = Date.now()
 
+    const body = rawBody ? new URLSearchParams(rawBody) : null
     const req = new Request(`${this.#url}${path}`, {
+      signal: AbortSignal.timeout(2000),
       method: method ?? (body ? 'POST' : 'GET'),
       ...(body ?
         {
-          body: new URLSearchParams(body),
+          body,
           headers: {
             'content-type': 'application/x-www-form-urlencoded',
-            'content-length': Buffer.byteLength(
-              new URLSearchParams(body).toString(),
-            ).toString(),
+            'content-length': Buffer.byteLength(body.toString()).toString(),
           },
         }
       : {}),
-      signal: AbortSignal.timeout(2000),
     })
 
     if (req.method === 'POST' && this.#dryRun) {

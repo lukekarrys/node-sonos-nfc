@@ -43,17 +43,14 @@ export class FindReader {
       }),
     )
 
-    const cards = new Map<string, number>()
-
     reader
-      .on('card', async ({ uid = '' }) => {
-        cards.set(uid, Date.now())
-
-        log.info(`card: ${uid}`)
+      .on('card.on', async (c) => {
+        log.info(`card.on`)
+        log.debug(`card.on`, c)
 
         const records = await getCardRecords(reader)
 
-        log.info(`records:`, records)
+        log.info(`card records`, records)
 
         for (const record of records ?? []) {
           try {
@@ -63,13 +60,6 @@ export class FindReader {
             break
           }
         }
-      })
-      .on('card.off', ({ uid = '' }) => {
-        const start = cards.get(uid)
-        log.debug(
-          `card.off: ${uid}${start ? ` - ${Date.now() - start}ms` : ''}`,
-        )
-        cards.delete(uid)
       })
       .on('error', (err) => log.error(`reader error:`, err))
       .on('end', () => {

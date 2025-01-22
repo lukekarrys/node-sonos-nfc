@@ -1,9 +1,9 @@
 import * as dotenv from 'dotenv'
 import logger, { log, type Level } from './logger.ts'
 import { FindReader } from './reader.ts'
-import { readline } from './readline.ts'
 import { Sonos } from './sonos.ts'
 import { execSync } from 'child_process'
+import { createInterface } from 'readline/promises'
 
 dotenv.config()
 
@@ -27,17 +27,39 @@ const main = async (opts: {
     initialRoom: opts.roomName,
     dryRun: opts.dryRun,
   })
+
+  try {
+    await sonos.init()
+  } catch (err) {
+    if (
+      err instanceof Error &&
+      err.cause instanceof Error &&
+      'code' in err.cause &&
+      err.cause.code === 'ECONNREFUSED'
+    ) {
+      throw new Error(
+        `Connection refused to ${opts.host}. Make sure server is running.`,
+      )
+    }
+  }
+
   const request = async (txt: string) => void (await sonos.process(txt))
 
-  if (opts.cardName === null) {
-    await sonos.init()
-    await readline({ request })
-  } else {
-    await Promise.all([
-      sonos.init(),
-      new FindReader({ cardName: opts.cardName, request }).init(),
-    ])
+  if (opts.cardName) {
+    await new FindReader({ cardName: opts.cardName, request }).init()
     log.info('READY')
+    return
+  }
+
+  const rl = createInterface(process.stdin, process.stdout)
+
+  while (true) {
+    try {
+      const line = await rl.question('sonos > ')
+      await request(line)
+    } catch (err) {
+      log.error(err)
+    }
   }
 }
 
