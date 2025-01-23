@@ -45,7 +45,7 @@ export class Sonos {
     }
 
     const isUrl = URL.canParse(cmd) ? new URL(cmd).origin !== 'null' : false
-    const isShorthand = cmd.includes(':')
+    const isShorthand = !isUrl && cmd.includes(':')
 
     if (isUrl || isShorthand) {
       return this.#request(`/replace-queue${isShorthand ? `/${cmd}` : ''}`, {
