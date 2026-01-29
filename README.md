@@ -1,4 +1,6 @@
-# Install
+# node-sonos-nfc
+
+Originally forked from [ryanold's node-sonos-nfc](https://github.com/ryanolf/node-sonos-nfc). This is a rewrite with only the features I needed (no included HTTP API).
 
 ## Card reader setup
 
